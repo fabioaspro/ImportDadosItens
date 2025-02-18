@@ -197,6 +197,7 @@ export class ListComponent {
         this.lista = response.items
         this.poUpload.clear()
         this.lista.sort(this.srvTotvs.ordenarCampos(['iLinha']))
+        this.lDisable=false
         this.loadTela = false
 
       },
@@ -315,6 +316,7 @@ export class ListComponent {
     this.lista = []
     this.poUpload.clear()
     this.loadTela = false
+    this.lDisable=false
 
   }
 
