@@ -3,12 +3,12 @@
         <form [formGroup]="form">
             
             <!--
-            
+            p-url="https://hawebdev.dieboldnixdorf.com.br:8543/api/integracao/import/v1/apiesim001/addFiles"
             [p-url]="_url"
             <po-button p-tooltip="Arquivo de Upload" name='btUpload' [p-disabled]="lBotao" style="margin-right: 50px" p-icon="po-icon po-icon-upload" p-kind="primary"  p-label="Upload" (p-click)="ChamaObterBRR()"></po-button>-->
             <po-upload #upload
                        name="upload"
-                       p-url="https://hawebdev.dieboldnixdorf.com.br:8543/api/integracao/import/v1/apiesim001/addFiles"
+                       [p-url]="_url"
                        p-icon="bi bi-cloud-upload"
                        p-label="Selecione o Arquivo para Importação" 
                        
@@ -73,19 +73,34 @@
     </po-table>
   </div>
 
-  <po-modal #telaAltera p-title="Altere os Dados do Item"
+  <po-modal #telaAltera p-title="Altere os Dados do Item [ {{ objSolic }} ]"
                               p-size="auto" 
                               p-click-out="false" 
                               [p-hide-close]="true"
                               [p-primary-action]="acaoAlterarLinha" 
                               [p-secondary-action]="acaoCancelarLinha">
       <form [formGroup]="formAltera">
-        <div class="po-md-6">
-            <po-number name="PesoBruto"   formControlName="PesoBruto"   p-label="Peso Bruto"   p-step="1" [p-min]="0"></po-number>
-            <po-number name="PesoLiquido" formControlName="PesoLiquido" p-label="Peso Líquido" p-step="1" [p-min]="0"></po-number>
-            <po-number name="Altura"      formControlName="Altura"      p-label="Altura"       p-step="1" [p-min]="0"></po-number>
-            <po-number name="Largura"     formControlName="Largura"     p-label="Largura"      p-step="1" [p-min]="0"></po-number>
-            <po-number name="Comprimento" formControlName="Comprimento" p-label="Comprimento"  p-step="1" [p-min]="0"></po-number>
+        <div class="po-md-12">
+            <po-widget p-title="Dados do Item">
+
+                
+
+                <div class="po-md-6">
+                    <div style="display: flex;flex-direction: column;">
+                        <div><label class="po-font-text-large-bold">Peso Bruto</label></div>
+                        <div><input [leadZero]="true" thousandSeparator="." mask="separator.3" decimalMarker="," class="po-input" formControlName="pesoBru" p-label="Peso Bruto" /></div>
+                    </div>
+                </div>
+                <div class="po-md-6">
+                    <div style="display: flex;flex-direction: column;">
+                        <div><label class="po-font-text-large-bold">Peso Líquido</label></div>
+                        <div><input [leadZero]="true" thousandSeparator="." mask="separator.3" decimalMarker="," class="po-input" formControlName="pesoLiq" p-label="Peso Líquido" /></div>
+                    </div>
+                </div>
+                <div class="po-md-6"><po-number name="Altura"  formControlName="Altura"  p-label="Altura"       ></po-number></div>
+                <div class="po-md-6"><po-number name="Largura" formControlName="Largura" p-label="Largura"      ></po-number></div>
+                <div class="po-md-6"><po-number name="Compri"  formControlName="Compri"  p-label="Comprimento"  ></po-number></div>
+            </po-widget>
         </div>
       </form>
   </po-modal>

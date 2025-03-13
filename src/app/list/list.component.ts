@@ -9,10 +9,8 @@ import { PoUploadComponent, PoModule, PoUploadFile, PoTableColumn, PoTableModule
 import { ServerTotvsService } from '../services/server-totvs.service';
 import { ExcelService } from '../services/excel-service.service';
 import { escape } from 'querystring';
-import { environment } from '../environments/environment';
-
-//--- Header somente para DEV
-//const headersTotvs = new HttpHeaders(environment.totvs_header)
+import { environment } from '../environments/environment'
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 
 @Component({
   selector: 'app-list',
@@ -31,6 +29,8 @@ import { environment } from '../environments/environment';
     PoMenuModule,
     PoPageModule,
     HttpClientModule,
+    NgxMaskDirective,
+    NgxMaskPipe
   ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.css'
@@ -54,17 +54,21 @@ export class ListComponent {
   tituloTela!: string
   mudaCampos!: number | null
   pesquisa!: string
-  nomeBotao: any;
+  nomeBotao: any
+  linhaSelecionada: any = undefined
   lBotao: boolean = false
   alturaGrid: number = window.innerHeight - 270
   objSelecionado:any
   lDisable: boolean = false
 
-  headersTotvs = {    
-    'Authorization': 'Basic c3VwZXI6cHJvZGllYm9sZDEx'
-    //'CompanyId': '1'
-  }  
-
+  /*headersTotvs = {    
+    'Authorization': 'Basic c3VwZXI6cHJvZGllYm9sZDEx',
+    'CompanyId': '1'
+  }*/
+  
+ //para nao fixar o Headers
+  headersTotvs = environment.headersTotvsI
+  
   //lista: any;
   tipoAcao: string = ''
   @ViewChild('poTable') poTable!: PoTableComponent;
@@ -74,6 +78,8 @@ export class ListComponent {
 
   //Para não fixar a URL
   _url = environment.totvs_url + "/addFiles";
+  
+  objSolic!: any[];
 
   //---Grid
   colunas!: PoTableColumn[]
@@ -89,46 +95,35 @@ export class ListComponent {
   };
 
   customLiterals: PoTableLiterals = {
-    noData: 'DADOS IMPORTADOS DO ARQUIVO [v 1.01]'
+    noData: 'Importe os dados do Arquivo [v 1.01]'
   };
 
   //Formulario
-  
   public form = this.formImport.group({
     //codEstabel: ['', Validators.required],
     //codFilial: ['', Validators.required],
     //numRR: ['', Validators.required],
     //itCodigo: [''],
     //tpBusca: [2, Validators.required],
-  });
-
- 
-  
+  });  
 
   public formAltera = this.formB.group({
-    "qt-troca": [0, Validators.required],
-    
+    "pesoBru": [0, Validators.required],
+    "pesoLiq": [0, Validators.required],
+    "Altura":  [0, Validators.required],
+    "Largura": [0, Validators.required],
+    "Compri":  [0, Validators.required],
   });
 
   //--- Actions
   readonly opcoes: PoTableAction[] = [
-    {
-      label: 'Editar',
-      icon: 'bi bi-pencil-square',
-      action: this.onEditar.bind(this),
-    },
-    {
-      separator: true,
-      label: 'Deletar',
-      icon: 'bi bi-trash',
-      action: this.onDeletar.bind(this),
-      type: 'danger'
-    }];
+    { label: 'Editar', icon: 'bi bi-pencil-square', action: this.onAlterarGrid.bind(this) },
+  ];
 
 
   readonly acaoSalvar: PoModalAction = {
     label: 'Salvar',
-    action: () => { this.onSalvar() }
+    action: () => { this.onSalvar.bind(this) }
   }
 
   readonly acaoCancelar: PoModalAction = {
@@ -155,9 +150,7 @@ export class ListComponent {
 
   readonly acaoAlterarLinha: PoModalAction = {
     label: 'Salvar',
-    action: () => {
-      //this.alterarOrdem()
-    },
+    action: () => {this.onSalvar()},
    
     disabled: !this.formAltera.valid,
   };
@@ -305,9 +298,32 @@ export class ListComponent {
 
   }
 
-  onAlterarGrid(obj:any){
-    this.objSelecionado = obj
-    this.telaAltera?.open()
+  onAlterarGrid(obj: any | null){
+
+    this.objSolic = obj.codItem
+    this.linhaSelecionada = obj
+
+    this.telaAltera?.open();
+
+    if ((obj !== null) && (obj['$showAction'] !== undefined))
+       delete obj['$showAction']
+
+    if (obj !== null) {
+      this.formAltera.patchValue(obj)
+    }
+
+  }
+
+  //---Salvar Registro
+  onSalvar() {
+    
+    this.linhaSelecionada.pesoBru = this.formAltera.controls.pesoBru.value
+    this.linhaSelecionada.pesoLiq = this.formAltera.controls.pesoLiq.value
+    this.linhaSelecionada.Altura  = this.formAltera.controls.Altura.value
+    this.linhaSelecionada.Largura = this.formAltera.controls.Largura.value
+    this.linhaSelecionada.Compri  = this.formAltera.controls.Compri.value
+    
+    this.telaAltera?.close();
   }
 
   onAtualizar(){
@@ -483,12 +499,6 @@ export class ListComponent {
       },
       cancel: () => this.srvNotification.error("Cancelada pelo usuário")
     })
-  }
-
-  //---Salvar Registro
-  onSalvar() {
-
-
   }
 
 }

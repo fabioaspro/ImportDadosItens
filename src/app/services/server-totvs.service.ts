@@ -31,11 +31,11 @@ export class ServerTotvsService {
   //------------ Colunas Grid Prioridade
   obterColunas(): Array<PoTableColumn> {
     return [
-      { property: 'iLinha',        label: "Linha", type: 'number', format: "1.0-0" }, //, visible: false},
-      { property: 'codItem',       label: "Item"}, //,  type: 'number', format: "1.2-2"},
+      { property: 'iLinha',        label: "Linha", type: 'number', format: "1.0-0", visible: false},
+      { property: 'codItem',       label: "Item"}, 
       { property: 'descItem',      label: "Descrição"},
-      { property: 'pesoBru',       label: "Peso Bruto"},
-      { property: 'pesoLiq',       label: "Peso Líquido"},
+      { property: 'pesoBru',       label: "Peso Bruto",   type: 'number', format: "1.3-3"},
+      { property: 'pesoLiq',       label: "Peso Líquido", type: 'number', format: "1.3-3"},
       { property: 'Altura',        label: "Altura"},
       { property: 'Largura',       label: "Largura"},
       { property: 'Compri',        label: "Comprimento"},
@@ -64,6 +64,11 @@ export class ServerTotvsService {
     return this.http.post(`${this._url}/ObterDados`, params, {headers:headersTotvs}).pipe(take(1))
   }
 
+  //Usando paginação
+  public ObterDadosP(params?: any){
+    return this.http.post(`${this._url}/ObterDadosP`, params, {headers:headersTotvs}).pipe(take(1))
+  }
+  
   //abaixo não é usado, só exemplo
   //------------ Colunas Grid Prioridade
   obterColunasEmergencial(): Array<PoTableColumn> {

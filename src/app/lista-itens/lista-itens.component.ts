@@ -48,12 +48,19 @@ export class ListaItensComponent {
   alturaGrid:number=window.innerHeight - 295
   lBotao:boolean = false
   pesquisa!:string
+  
+  //paginação do grid
+  itensPaginados = []
+  page = 1
+  pageSize = 20
+  disableShowMore = false
 
   //---Grid
   colunas!: PoTableColumn[]
   lista!: any[]
    customLiterals: PoTableLiterals = {
-    noData: 'Infome os filtros para Buscar os Dados'
+    noData: 'Infome os filtros para Buscar os Dados',
+    loadMoreData: 'Carregar mais resultados',
   };
 
   //Formulario
@@ -63,6 +70,42 @@ export class ListaItensComponent {
     //tpBusca: [1, Validators.required],
   });
 
+  onBuscaDadosP(){
+    this.itensPaginados = []
+    this.page = 1
+    this.pageSize = 20
+    this.lista = []
+    this.loadMoreItens()
+  }
+
+  loadMoreItens(){
+
+    this.labelLoadTela = "Carregando Dados"
+     
+    this.loadTela = true
+    this.desabilitaForm()
+    let paramsTela: any = { items: this.form.value, page: this.page, pageSize: this.pageSize }
+        
+    this.srvTotvs.ObterDadosP(paramsTela).subscribe({
+      next: (response: any) => {
+        
+        this.srvNotification.success('Dados listados com sucesso !')
+        //this.lista = response.items
+        this.loadTela = false
+        this.lista = this.page === 1 ? response.items : [...this.lista, ...response.items]
+
+        this.disableShowMore = response.items.length < this.pageSize
+        this.page++;
+        this.habilitaForm()
+      },
+      error: (e) => {
+        this.srvNotification.error('Ocorreu um erro ObterDados: ' + e)
+        this.loadTela = false
+        this.habilitaForm()
+      },
+    })
+  }
+
   ChamaImport (){
 
     this.router.navigate(['list'])
@@ -70,7 +113,9 @@ export class ListaItensComponent {
   }
 
   ChamaObterDados(){
-    this.labelLoadTela = "Carregando Dados..."
+
+    //Sem usar paginação
+    this.labelLoadTela = "Carregando Dados"
     this.loadTela = true;
     this.desabilitaForm()
     let paramsTela: any = { items: this.form.value }
@@ -81,11 +126,10 @@ export class ListaItensComponent {
     this.srvTotvs.ObterDados(paramsTela).subscribe({
       next: (response: any) => {
         
-        this.srvNotification.success('Dados listados com sucesso !')
+        this.srvNotification.success('Dados listados com sucesso!')
         this.lista = response.items
         this.loadTela = false
         this.lista.sort(this.srvTotvs.ordenarCampos(['iLinha']))
-        
         this.habilitaForm()
        
       },
