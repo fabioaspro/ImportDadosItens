@@ -95,7 +95,7 @@ export class ListComponent {
   };
 
   customLiterals: PoTableLiterals = {
-    noData: 'Importe os dados do Arquivo [v 1.01]'
+    noData: 'Importe os dados do Arquivo [v1.01]'
   };
 
   //Formulario
